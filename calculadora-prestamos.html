@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Préstamos | Argentina 2026</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:      #0B1D3A;
+      --navy-mid:  #142848;
+      --navy-card: #1A3560;
+      --navy-border:#234275;
+      --blue-light:#2563EB;
+      --blue-glow: #3B82F6;
+      --gold:      #F59E0B;
+      --gold-light:#FCD34D;
+      --green:     #10B981;
+      --red:       #EF4444;
+      --orange:    #F97316;
+      --text:      #E2E8F0;
+      --text-dim:  #94A3B8;
+      --text-muted:#64748B;
+      --white:     #FFFFFF;
+      --radius:    12px;
+      --shadow:    0 4px 24px rgba(0,0,0,.45);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #050E1F 0%, #0B1D3A 50%, #0A1628 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(90deg, #0D2147 0%, #142D5C 50%, #0D2147 100%);
+      border-bottom: 2px solid var(--navy-border);
+      padding: 0 2rem;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,.6);
+    }
+    .header-inner {
+      max-width: 1400px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 70px;
+    }
+    .logo { display: flex; align-items: center; gap: .75rem; }
+    .logo-icon {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, var(--gold), #D97706);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 0 16px rgba(245,158,11,.4);
+    }
+    .logo-text h1 { font-size: 1.2rem; font-weight: 700; color: var(--white); letter-spacing: .5px; }
+    .logo-text span { font-size: .75rem; color: var(--gold-light); letter-spacing: 2px; text-transform: uppercase; }
+    .header-badge {
+      background: rgba(245,158,11,.15);
+      border: 1px solid rgba(245,158,11,.4);
+      color: var(--gold-light);
+      padding: .35rem .9rem; border-radius: 50px;
+      font-size: .78rem; font-weight: 600;
+    }
+
+    /* ── Layout ── */
+    .page { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+    /* ── Alert bar ── */
+    .alert-bar {
+      background: linear-gradient(90deg, rgba(245,158,11,.12), rgba(245,158,11,.05));
+      border: 1px solid rgba(245,158,11,.3);
+      border-radius: var(--radius);
+      padding: .85rem 1.25rem;
+      display: flex; align-items: center; gap: .75rem;
+      margin-bottom: 2rem;
+      font-size: .85rem; color: var(--gold-light);
+    }
+    .alert-bar .icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    /* ── Section titles ── */
+    .section-title {
+      font-size: 1rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--gold); margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--navy-border), transparent);
+    }
+
+    /* ── Grid layout ── */
+    .grid-2 { display: grid; grid-template-columns: 380px 1fr; gap: 1.5rem; align-items: start; }
+
+    /* ── Card ── */
+    .card {
+      background: linear-gradient(145deg, var(--navy-card), #152d5a);
+      border: 1px solid var(--navy-border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── Inputs ── */
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: .82rem; font-weight: 600;
+      color: var(--text-dim); text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: .5rem;
+    }
+    .form-group label .hint {
+      font-size: .72rem; font-weight: 400; color: var(--text-muted);
+      text-transform: none; letter-spacing: 0;
+    }
+    .input-wrap { position: relative; }
+    .input-prefix, .input-suffix {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      font-size: .85rem; color: var(--gold); font-weight: 700;
+      pointer-events: none;
+    }
+    .input-prefix { left: .9rem; }
+    .input-suffix { right: .9rem; }
+    input[type="number"], input[type="range"], select {
+      width: 100%;
+      background: rgba(10,22,40,.7);
+      border: 1.5px solid var(--navy-border);
+      border-radius: 8px;
+      color: var(--white);
+      font-size: 1rem; font-weight: 600;
+      padding: .65rem .9rem .65rem 2.2rem;
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      -moz-appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus {
+      border-color: var(--blue-glow);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+    }
+    input[type="number"].no-prefix { padding-left: .9rem; }
+    .input-suffix-wrap input[type="number"] { padding-right: 2.8rem; }
+
+    input[type="range"] {
+      padding: 0; height: 6px; cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+      border: none; border-radius: 50px;
+      background: linear-gradient(90deg, var(--blue-glow) 0%, var(--navy-border) 0%);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      background: var(--gold); border-radius: 50%;
+      cursor: pointer; border: 2px solid var(--white);
+      box-shadow: 0 0 8px rgba(245,158,11,.5);
+    }
+
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .6rem .9rem;
+      background: rgba(10,22,40,.5);
+      border: 1.5px solid var(--navy-border);
+      border-radius: 8px; margin-bottom: .75rem;
+    }
+    .toggle-row label { font-size: .85rem; color: var(--text-dim); margin: 0; }
+    .toggle {
+      position: relative; width: 44px; height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider-toggle {
+      position: absolute; inset: 0;
+      background: var(--navy-border); border-radius: 50px; cursor: pointer;
+      transition: .3s;
+    }
+    .slider-toggle::before {
+      content: ''; position: absolute;
+      width: 18px; height: 18px; left: 3px; bottom: 3px;
+      background: white; border-radius: 50%; transition: .3s;
+    }
+    .toggle input:checked + .slider-toggle { background: var(--blue-glow); }
+    .toggle input:checked + .slider-toggle::before { transform: translateX(20px); }
+
+    .divider {
+      height: 1px; background: var(--navy-border);
+      margin: 1.25rem 0;
+    }
+
+    .btn-calc {
+      width: 100%;
+      background: linear-gradient(135deg, #1D4ED8, #2563EB);
+      color: white; border: none; border-radius: 10px;
+      padding: .9rem; font-size: 1rem; font-weight: 700;
+      cursor: pointer; letter-spacing: .5px;
+      transition: transform .15s, box-shadow .15s;
+      box-shadow: 0 4px 16px rgba(37,99,235,.4);
+    }
+    .btn-calc:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,.5); }
+    .btn-calc:active { transform: translateY(0); }
+
+    /* ── Summary metrics ── */
+    .metrics-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .metric-card {
+      background: linear-gradient(145deg, rgba(26,53,96,.8), rgba(15,35,70,.9));
+      border: 1px solid var(--navy-border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.25rem;
+      position: relative; overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+    .metric-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .metric-card.gold::before   { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+    .metric-card.blue::before   { background: linear-gradient(90deg, #2563EB, #60A5FA); }
+    .metric-card.green::before  { background: linear-gradient(90deg, var(--green), #34D399); }
+    .metric-card.orange::before { background: linear-gradient(90deg, var(--orange), #FB923C); }
+    .metric-card.red::before    { background: linear-gradient(90deg, var(--red), #F87171); }
+    .metric-card.purple::before { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
+
+    .metric-label {
+      font-size: .7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted); margin-bottom: .3rem;
+    }
+    .metric-value {
+      font-size: 1.55rem; font-weight: 800;
+      color: var(--white); line-height: 1.1;
+    }
+    .metric-sub {
+      font-size: .72rem; color: var(--text-dim); margin-top: .3rem;
+    }
+    .metric-icon {
+      position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);
+      font-size: 1.8rem; opacity: .15;
+    }
+
+    /* ── Rate highlight ── */
+    .rate-highlight {
+      background: linear-gradient(135deg, rgba(245,158,11,.1), rgba(245,158,11,.05));
+      border: 1px solid rgba(245,158,11,.3);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.5rem;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1rem; margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .rate-item { }
+    .rate-item .rate-label { font-size: .7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .8px; }
+    .rate-item .rate-val { font-size: 1.35rem; font-weight: 800; color: var(--gold); }
+    .rate-item .rate-val.big { font-size: 1.6rem; color: var(--gold-light); }
+    .rate-sep { width: 1px; background: var(--navy-border); }
+
+    /* ── Totals row ── */
+    .totals-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .total-item {
+      background: rgba(10,22,40,.5);
+      border: 1px solid var(--navy-border);
+      border-radius: 10px;
+      padding: .9rem 1.1rem;
+      display: flex; align-items: center; gap: .75rem;
+    }
+    .total-item .ti-icon { font-size: 1.5rem; }
+    .total-item .ti-text .ti-label { font-size: .7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .8px; }
+    .total-item .ti-text .ti-val { font-size: 1.1rem; font-weight: 700; color: var(--white); }
+
+    /* ── Charts ── */
+    .charts-row {
+      display: grid; grid-template-columns: 280px 1fr;
+      gap: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .chart-container { position: relative; }
+    .chart-container canvas { max-height: 220px; }
+
+    /* ── Amortization table ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--navy-border);
+    }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: .82rem;
+    }
+    thead { background: linear-gradient(90deg, #0D2147, #142D5C); position: sticky; top: 0; }
+    thead th {
+      padding: .75rem .9rem; text-align: right;
+      font-size: .7rem; text-transform: uppercase; letter-spacing: .8px;
+      color: var(--text-dim); font-weight: 700; white-space: nowrap;
+      border-bottom: 2px solid var(--navy-border);
+    }
+    thead th:first-child { text-align: center; }
+    tbody tr { border-bottom: 1px solid rgba(35,66,117,.4); transition: background .15s; }
+    tbody tr:hover { background: rgba(37,99,235,.08); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td {
+      padding: .6rem .9rem; text-align: right;
+      color: var(--text);
+    }
+    tbody td:first-child { text-align: center; font-weight: 700; color: var(--text-dim); }
+    tbody td.capital { color: var(--green); }
+    tbody td.interes { color: #93C5FD; }
+    tbody td.iva { color: #C4B5FD; }
+    tbody td.seguro { color: #FCA5A5; }
+    tbody td.cuota-total { font-weight: 700; color: var(--white); }
+    tbody td.saldo { color: var(--text-dim); }
+    tfoot tr { background: linear-gradient(90deg, rgba(245,158,11,.1), rgba(245,158,11,.05)); }
+    tfoot td {
+      padding: .75rem .9rem; text-align: right;
+      font-weight: 700; color: var(--gold-light);
+      border-top: 2px solid rgba(245,158,11,.3);
+    }
+    tfoot td:first-child { text-align: center; }
+
+    /* ── Comparison table ── */
+    .comparison-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--navy-border);
+      margin-top: 1.5rem;
+    }
+    .comp-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    .comp-table thead { background: linear-gradient(90deg, #0D2147, #142D5C); }
+    .comp-table thead th {
+      padding: .75rem 1rem; text-align: center;
+      font-size: .72rem; text-transform: uppercase; letter-spacing: .8px;
+      color: var(--text-dim); border-bottom: 2px solid var(--navy-border);
+    }
+    .comp-table tbody tr { border-bottom: 1px solid rgba(35,66,117,.4); }
+    .comp-table tbody td { padding: .65rem 1rem; text-align: center; }
+    .comp-table tbody tr.highlight-row { background: rgba(37,99,235,.12); border-left: 3px solid var(--blue-glow); }
+    .comp-table tbody tr.highlight-row td:first-child { font-weight: 700; color: var(--blue-glow); }
+    .badge {
+      display: inline-block; padding: .2rem .6rem;
+      border-radius: 50px; font-size: .7rem; font-weight: 700;
+    }
+    .badge-green { background: rgba(16,185,129,.2); color: #34D399; }
+    .badge-orange { background: rgba(249,115,22,.2); color: #FB923C; }
+    .badge-red { background: rgba(239,68,68,.2); color: #F87171; }
+    .badge-blue { background: rgba(37,99,235,.2); color: #93C5FD; }
+
+    /* ── Warning box ── */
+    .warning-box {
+      background: rgba(239,68,68,.08);
+      border: 1px solid rgba(239,68,68,.3);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      display: flex; gap: .75rem; align-items: flex-start;
+      margin-top: 1rem; font-size: .82rem;
+      display: none;
+    }
+    .warning-box.show { display: flex; }
+
+    /* ── Info box ── */
+    .info-box {
+      background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.3);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      font-size: .82rem; color: #A7F3D0;
+      margin-top: 1rem;
+    }
+    .info-box strong { color: var(--green); }
+
+    /* ── Glossary ── */
+    .glossary {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .gloss-item {
+      background: rgba(10,22,40,.5);
+      border: 1px solid var(--navy-border);
+      border-radius: 10px; padding: .9rem 1.1rem;
+    }
+    .gloss-item .gloss-term {
+      font-size: .85rem; font-weight: 800;
+      color: var(--gold); margin-bottom: .3rem;
+    }
+    .gloss-item .gloss-def { font-size: .8rem; color: var(--text-dim); }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 2rem;
+      color: var(--text-muted); font-size: .75rem;
+      border-top: 1px solid var(--navy-border);
+      margin-top: 2rem;
+    }
+    footer strong { color: var(--text-dim); }
+
+    /* ── Tooltip ── */
+    [data-tip] { cursor: help; border-bottom: 1px dashed var(--text-muted); }
+
+    /* ── Print ── */
+    .btn-print {
+      background: rgba(245,158,11,.15);
+      border: 1px solid rgba(245,158,11,.4);
+      color: var(--gold-light);
+      padding: .5rem 1rem; border-radius: 8px;
+      font-size: .82rem; font-weight: 600; cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-print:hover { background: rgba(245,158,11,.25); }
+
+    /* ── Utility ── */
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .text-right { text-align: right; }
+    .mt-1 { margin-top: .5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .hidden { display: none !important; }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center; padding: 3rem 2rem;
+      color: var(--text-muted);
+    }
+    .empty-state .es-icon { font-size: 3rem; margin-bottom: 1rem; opacity: .4; }
+    .empty-state p { font-size: .9rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .rate-highlight { grid-template-columns: repeat(2, 1fr); }
+      .rate-sep { display: none; }
+    }
+    @media (max-width: 768px) {
+      .page { padding: 1rem; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .totals-row { grid-template-columns: 1fr; }
+      .charts-row { grid-template-columns: 1fr; }
+      .glossary { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+      .rate-highlight { grid-template-columns: 1fr 1fr; }
+    }
+    @media print {
+      header, .btn-print, .alert-bar, .btn-calc { display: none !important; }
+      body { background: white !important; color: black !important; }
+      .card, .metric-card { background: #f8f9fa !important; border-color: #dee2e6 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">💰</div>
+      <div class="logo-text">
+        <h1>Calculadora de Préstamos</h1>
+        <span>Sistema Financiero Argentino</span>
+      </div>
+    </div>
+    <div class="header-badge">🇦🇷 Argentina · Mayo 2026</div>
+  </div>
+</header>
+
+<!-- ══════════════ MAIN PAGE ══════════════ -->
+<div class="page">
+
+  <!-- Alerta contextual -->
+  <div class="alert-bar">
+    <span class="icon">📊</span>
+    <span>
+      Contexto de mercado (Abril 2026): <strong>Banco Nación</strong> TNA 60% · TEA 79,59% · CFT 102,36% &nbsp;|&nbsp;
+      <strong>Banco Provincia</strong> TNA 98% &nbsp;|&nbsp;
+      Financieras no bancarias CFT promedio: 1.427% &nbsp;|&nbsp;
+      IVA sobre intereses: <strong>21%</strong>
+    </span>
+  </div>
+
+  <div class="grid-2">
+
+    <!-- ════ PANEL IZQUIERDO: INPUTS ════ -->
+    <div>
+      <div class="card">
+        <div class="section-title">⚙️ Datos del Préstamo</div>
+
+        <!-- Monto -->
+        <div class="form-group">
+          <label>Monto a financiar <span class="hint">Capital solicitado</span></label>
+          <div class="input-wrap">
+            <span class="input-prefix">$</span>
+            <input type="number" id="monto" value="1000000" min="1000" step="1000"
+                   placeholder="1.000.000" oninput="onInputChange()" />
+          </div>
+        </div>
+
+        <!-- Cuotas -->
+        <div class="form-group">
+          <label>
+            Número de cuotas
+            <span class="hint" id="cuotas-hint">12 cuotas</span>
+          </label>
+          <div class="input-wrap">
+            <input type="number" id="cuotas" value="12" min="1" max="120" class="no-prefix"
+                   oninput="syncSlider('cuotas','cuotas-slider'); onInputChange()" />
+          </div>
+          <input type="range" id="cuotas-slider" min="1" max="120" value="12" style="margin-top:.5rem"
+                 oninput="syncInput('cuotas-slider','cuotas'); document.getElementById('cuotas-hint').textContent=this.value+' cuotas'; onInputChange()" />
+        </div>
+
+        <!-- Valor cuota -->
+        <div class="form-group">
+          <label>Valor de cuota mensual <span class="hint">Monto fijo de cada cuota</span></label>
+          <div class="input-wrap">
+            <span class="input-prefix">$</span>
+            <input type="number" id="cuota" value="120000" min="1" step="100"
+                   placeholder="120.000" oninput="onInputChange()" />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-title" style="font-size:.8rem">🔧 Costos Adicionales</div>
+
+        <!-- Seguro de vida -->
+        <div class="toggle-row">
+          <label>Seguro de vida (% mensual sobre saldo)</label>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-seguro" checked onchange="onInputChange()" />
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+        <div class="form-group" id="seguro-group">
+          <div class="input-wrap input-suffix-wrap">
+            <input type="number" id="seguro-pct" value="0.06" min="0" max="2" step="0.01" class="no-prefix"
+                   oninput="onInputChange()" />
+            <span class="input-suffix">%</span>
+          </div>
+          <div style="font-size:.72rem;color:var(--text-muted);margin-top:.3rem">
+            Referencia: 0,03% – 0,10% mensual sobre saldo. Obligatorio por regulación BCRA.
+          </div>
+        </div>
+
+        <!-- IVA sobre intereses -->
+        <div class="toggle-row">
+          <label>IVA sobre intereses (21%)</label>
+          <label class="toggle">
+            <input type="checkbox" id="toggle-iva" checked onchange="onInputChange()" />
+            <span class="slider-toggle"></span>
+          </label>
+        </div>
+
+        <!-- Gastos de otorgamiento -->
+        <div class="form-group" style="margin-top:.75rem">
+          <label>Gastos de otorgamiento <span class="hint">Cargo único inicial</span></label>
+          <div class="input-wrap">
+            <span class="input-prefix">$</span>
+            <input type="number" id="gastos" value="0" min="0" step="100"
+                   placeholder="0" oninput="onInputChange()" />
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <button class="btn-calc" onclick="calcular()">
+          Calcular préstamo
+        </button>
+
+        <!-- Warning box: cuota inviable -->
+        <div class="warning-box" id="warning-box">
+          <span>⚠️</span>
+          <div id="warning-text"></div>
+        </div>
+
+        <!-- Info box: validación OK -->
+        <div class="info-box mt-2 hidden" id="info-box">
+          ✓ Datos válidos. Sistema de amortización: <strong>Francés (cuota fija)</strong>.
+        </div>
+      </div>
+
+      <!-- Glosario -->
+      <div class="card" style="margin-top:1.5rem">
+        <div class="section-title">📚 Glosario de Tasas</div>
+        <div class="glossary">
+          <div class="gloss-item">
+            <div class="gloss-term">TEM</div>
+            <div class="gloss-def">Tasa Efectiva Mensual. La tasa real que se aplica cada mes. Base de todos los cálculos.</div>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">TNA</div>
+            <div class="gloss-def">Tasa Nominal Anual. TEM × 12. Sin capitalización. La más usada en publicidad bancaria.</div>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">TEA</div>
+            <div class="gloss-def">Tasa Efectiva Anual. (1+TEM)¹² – 1. Incluye capitalización compuesta. Siempre mayor que TNA.</div>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">CFT</div>
+            <div class="gloss-def">Costo Financiero Total. Incluye TEA + IVA sobre intereses + seguros + gastos. Regulado por BCRA.</div>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">TIR</div>
+            <div class="gloss-def">Tasa Interna de Retorno del flujo de fondos real del prestamista, incluyendo todos los costos.</div>
+          </div>
+          <div class="gloss-item">
+            <div class="gloss-term">CFT-NA</div>
+            <div class="gloss-def">CFT Nominal Anual. TIR mensual × 12. Es el indicador exigido en publicidad por el BCRA.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ PANEL DERECHO: RESULTADOS ════ -->
+    <div id="results-panel">
+
+      <!-- EMPTY STATE -->
+      <div class="card" id="empty-state">
+        <div class="empty-state">
+          <div class="es-icon">📊</div>
+          <p>Ingresá los datos del préstamo y hacé click en <strong>Calcular</strong> para ver el análisis completo.</p>
+        </div>
+      </div>
+
+      <!-- RESULTS (hidden until calculated) -->
+      <div id="results-content" class="hidden">
+
+        <!-- Tasas principales -->
+        <div class="card" style="margin-bottom:1.5rem">
+          <div class="flex-between" style="margin-bottom:1.25rem">
+            <div class="section-title" style="margin:0">📈 Tasas de Interés</div>
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+          </div>
+          <div class="rate-highlight">
+            <div class="rate-item">
+              <div class="rate-label">TEM</div>
+              <div class="rate-val big" id="res-tem">—</div>
+              <div style="font-size:.7rem;color:var(--text-muted)">Tasa Efectiva Mensual</div>
+            </div>
+            <div class="rate-sep"></div>
+            <div class="rate-item">
+              <div class="rate-label">TNA</div>
+              <div class="rate-val" id="res-tna">—</div>
+              <div style="font-size:.7rem;color:var(--text-muted)">Tasa Nominal Anual</div>
+            </div>
+            <div class="rate-sep"></div>
+            <div class="rate-item">
+              <div class="rate-label">TEA</div>
+              <div class="rate-val" id="res-tea">—</div>
+              <div style="font-size:.7rem;color:var(--text-muted)">Tasa Efectiva Anual</div>
+            </div>
+            <div class="rate-sep"></div>
+            <div class="rate-item">
+              <div class="rate-label">CFT NA</div>
+              <div class="rate-val" id="res-cft-na">—</div>
+              <div style="font-size:.7rem;color:var(--text-muted)">Costo Fin. Total Nominal</div>
+            </div>
+          </div>
+
+          <!-- Métricas adicionales -->
+          <div class="metrics-grid">
+            <div class="metric-card gold">
+              <div class="metric-label">CFT Efectivo Anual</div>
+              <div class="metric-value" id="res-cft-ea">—</div>
+              <div class="metric-sub">Costo real total incl. todos los cargos</div>
+              <div class="metric-icon">💳</div>
+            </div>
+            <div class="metric-card blue">
+              <div class="metric-label">TNA Diaria</div>
+              <div class="metric-value" id="res-tnd">—</div>
+              <div class="metric-sub">Tasa diaria equivalente (TEM/30)</div>
+              <div class="metric-icon">📅</div>
+            </div>
+            <div class="metric-card purple">
+              <div class="metric-label">TED (Diaria Efectiva)</div>
+              <div class="metric-value" id="res-ted">—</div>
+              <div class="metric-sub">(1+TEM)^(1/30) – 1</div>
+              <div class="metric-icon">⚡</div>
+            </div>
+            <div class="metric-card green">
+              <div class="metric-label">Total a Pagar (cuotas)</div>
+              <div class="metric-value" id="res-total">—</div>
+              <div class="metric-sub">Capital + intereses (sin costos)</div>
+              <div class="metric-icon">🏦</div>
+            </div>
+            <div class="metric-card orange">
+              <div class="metric-label">Total Intereses Pagados</div>
+              <div class="metric-value" id="res-int-total">—</div>
+              <div class="metric-sub">Costo del financiamiento puro</div>
+              <div class="metric-icon">📊</div>
+            </div>
+            <div class="metric-card red">
+              <div class="metric-label">Carga Financiera Total</div>
+              <div class="metric-value" id="res-carga">—</div>
+              <div class="metric-sub">% extra sobre el capital solicitado</div>
+              <div class="metric-icon">⚖️</div>
+            </div>
+          </div>
+
+          <!-- Totales desagregados -->
+          <div class="totals-row" id="totals-row-extra" style="display:none">
+            <div class="total-item">
+              <div class="ti-icon">🧾</div>
+              <div class="ti-text">
+                <div class="ti-label">IVA sobre intereses (21%)</div>
+                <div class="ti-val" id="res-total-iva">—</div>
+              </div>
+            </div>
+            <div class="total-item">
+              <div class="ti-icon">🛡️</div>
+              <div class="ti-text">
+                <div class="ti-label">Total seguros de vida</div>
+                <div class="ti-val" id="res-total-seguro">—</div>
+              </div>
+            </div>
+            <div class="total-item">
+              <div class="ti-icon">📋</div>
+              <div class="ti-text">
+                <div class="ti-label">Costo total con todos los cargos</div>
+                <div class="ti-val" id="res-grand-total">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="card" style="margin-bottom:1.5rem">
+          <div class="section-title">📊 Distribución del Costo</div>
+          <div class="charts-row">
+            <div class="chart-container">
+              <canvas id="donut-chart"></canvas>
+              <div id="donut-legend" style="margin-top:.75rem;font-size:.75rem;text-align:center"></div>
+            </div>
+            <div class="chart-container" style="flex:1">
+              <canvas id="bar-chart" style="max-height:240px"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de amortización -->
+        <div class="card" style="margin-bottom:1.5rem">
+          <div class="flex-between" style="margin-bottom:1.25rem">
+            <div class="section-title" style="margin:0">📋 Tabla de Amortización (Sistema Francés)</div>
+            <div style="font-size:.75rem;color:var(--text-muted)" id="table-cols-info"></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead id="table-head"></thead>
+              <tbody id="amort-body"></tbody>
+              <tfoot id="table-foot"></tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Comparativa de mercado -->
+        <div class="card">
+          <div class="section-title">🏛️ Comparativa con el Mercado Argentino (2026)</div>
+          <div style="font-size:.8rem;color:var(--text-dim);margin-bottom:1rem">
+            Referencia de tasas vigentes al mercado argentino (Abril–Mayo 2026). Fuente: BCRA, Banco Nación, Banco Provincia, Infobae.
+          </div>
+          <div class="comparison-table-wrap">
+            <table class="comp-table">
+              <thead>
+                <tr>
+                  <th>Entidad</th>
+                  <th>TNA</th>
+                  <th>TEA</th>
+                  <th>CFT Nominal</th>
+                  <th>Tipo</th>
+                  <th>vs. Tu Préstamo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight-row">
+                  <td id="comp-my-name">⭐ Tu Préstamo</td>
+                  <td id="comp-my-tna">—</td>
+                  <td id="comp-my-tea">—</td>
+                  <td id="comp-my-cft">—</td>
+                  <td><span class="badge badge-blue">Calculado</span></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>🏦 Banco Nación</td>
+                  <td>60,00%</td>
+                  <td>79,59%</td>
+                  <td>102,36%</td>
+                  <td><span class="badge badge-green">Bancario público</span></td>
+                  <td id="comp-nacion">—</td>
+                </tr>
+                <tr>
+                  <td>🏦 Banco Provincia</td>
+                  <td>98,00%</td>
+                  <td>~154%</td>
+                  <td>~180%</td>
+                  <td><span class="badge badge-green">Bancario público</span></td>
+                  <td id="comp-provincia">—</td>
+                </tr>
+                <tr>
+                  <td>🏪 Financieras no bancarias</td>
+                  <td>298,96%</td>
+                  <td>~2.100%</td>
+                  <td>1.427,15%</td>
+                  <td><span class="badge badge-red">No bancario</span></td>
+                  <td id="comp-fintech">—</td>
+                </tr>
+                <tr>
+                  <td>📱 Préstamos express / fintechs</td>
+                  <td>~500%+</td>
+                  <td>~5.000%+</td>
+                  <td>Hasta 29.000%</td>
+                  <td><span class="badge badge-red">Express online</span></td>
+                  <td id="comp-express">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="info-box" style="margin-top:1rem">
+            <strong>Nota regulatoria:</strong> Por normativa del BCRA, toda publicidad de crédito debe informar obligatoriamente el <strong>CFT (Costo Financiero Total)</strong> y no sólo la TNA. El CFT es el verdadero costo del crédito para el deudor.
+          </div>
+        </div>
+
+      </div><!-- /results-content -->
+    </div><!-- /results-panel -->
+  </div><!-- /grid-2 -->
+</div><!-- /page -->
+
+<footer>
+  <strong>Calculadora de Préstamos Argentina 2026</strong> · Sistema de amortización francés (cuota fija mensual) ·
+  Cálculos basados en normativa BCRA · CFT calculado mediante método TIR (IRR) ·
+  IVA sobre intereses: 21% · Referencia de mercado: Abril–Mayo 2026<br/>
+  <span style="color:var(--text-muted)">⚠️ Esta calculadora es informativa. Para contratación de préstamos, consultar con su entidad financiera.</span>
+</footer>
+
+<!-- ══════════════ JAVASCRIPT ══════════════ -->
+<script>
+// ── Globals ──
+let donutChart = null;
+let barChart = null;
+let lastTable = [];
+
+// ── Helpers ──
+const $ = id => document.getElementById(id);
+const fmt = n => new Intl.NumberFormat('es-AR', { style:'currency', currency:'ARS', minimumFractionDigits:2, maximumFractionDigits:2 }).format(n);
+const fmtPct = n => (n*100).toFixed(2) + '%';
+const fmtPctN = n => n.toFixed(2) + '%';
+
+function syncSlider(inputId, sliderId) {
+  const val = parseInt($(inputId).value) || 0;
+  $(sliderId).value = val;
+  $('cuotas-hint').textContent = val + ' cuotas';
+  updateSliderFill();
+}
+function syncInput(sliderId, inputId) {
+  $(inputId).value = $(sliderId).value;
+  updateSliderFill();
+}
+function updateSliderFill() {
+  const slider = $('cuotas-slider');
+  const min = +slider.min, max = +slider.max, val = +slider.value;
+  const pct = ((val - min)/(max - min))*100;
+  slider.style.background = `linear-gradient(90deg, var(--blue-glow) ${pct}%, var(--navy-border) ${pct}%)`;
+}
+function onInputChange() {
+  updateSliderFill();
+  // auto-recalc if we already showed results
+  if (!$('results-content').classList.contains('hidden')) calcular();
+}
+
+// ── Newton-Raphson: find TEM from P, C, n ──
+// P = C * [1-(1+r)^(-n)] / r
+function calcTEM(P, C, n) {
+  if (n === 1) return (C / P) - 1;
+  // Quick sanity: if C <= P/n there's no valid positive rate
+  if (C * n <= P) return NaN;
+
+  let r = (C * n - P) / (P * n); // rough initial guess
+  if (r <= 0) r = 0.01;
+  if (r > 5) r = 5;
+
+  for (let i = 0; i < 2000; i++) {
+    const pow = Math.pow(1 + r, n);
+    const f   = P - C * (pow - 1) / (r * pow);
+    const df  = C * ((pow - 1) * (r * n * (1+r) - pow*(r+1)+1)) / (r * r * pow * pow * (1+r));
+    if (!isFinite(f) || !isFinite(df) || df === 0) break;
+    const rNew = r - f / df;
+    if (Math.abs(rNew - r) < 1e-12) { r = rNew; break; }
+    r = rNew;
+    if (r <= 0) r = 1e-6;
+    if (r > 100) r = 100;
+  }
+  return r;
+}
+
+// ── IRR by bisection (for CFT) ──
+function calcIRR(flows) {
+  // flows[0] positive (inflow), rest negative (outflows)
+  let lo = -0.9999, hi = 100, mid = 0;
+  for (let i = 0; i < 300; i++) {
+    mid = (lo + hi) / 2;
+    const npv = flows.reduce((s, f, t) => s + f / Math.pow(1 + mid, t), 0);
+    if (Math.abs(npv) < 0.001) break;
+    if (npv > 0) lo = mid; else hi = mid;
+  }
+  return mid;
+}
+
+// ── Main calc ──
+function calcular() {
+  const P  = parseFloat($('monto').value);
+  const n  = parseInt($('cuotas').value);
+  const C  = parseFloat($('cuota').value);
+  const seguroPct   = $('toggle-seguro').checked ? parseFloat($('seguro-pct').value)/100 : 0;
+  const ivaEnabled  = $('toggle-iva').checked;
+  const gastosOtorg = parseFloat($('gastos').value) || 0;
+  const IVA_RATE    = 0.21;
+
+  // Validation
+  const warnBox  = $('warning-box');
+  const infoBox  = $('info-box');
+  warnBox.classList.remove('show');
+  infoBox.classList.add('hidden');
+
+  if (!P || !n || !C || P <= 0 || n <= 0 || C <= 0) {
+    $('warning-text').innerHTML = 'Completá todos los campos con valores positivos.';
+    warnBox.classList.add('show');
+    return;
+  }
+  if (C <= P / n) {
+    $('warning-text').innerHTML =
+      `La cuota (${ fmt(C) }) no alcanza ni para cubrir el capital dividido en ${n} cuotas (${ fmt(P/n) }). `+
+      `La cuota mínima para este monto y plazo sería mayor a ${ fmt(P/n + 1) }. `+
+      `Con esa cuota la deuda nunca se cancelaría.`;
+    warnBox.classList.add('show');
+    return;
+  }
+  if (C * n < P * 1.001) {
+    $('warning-text').innerHTML = 'El total a pagar es menor o igual al monto solicitado. Eso implicaría tasa cero o negativa.';
+    warnBox.classList.add('show');
+    return;
+  }
+
+  // Solve TEM
+  const TEM = calcTEM(P, C, n);
+  if (!isFinite(TEM) || isNaN(TEM) || TEM <= 0) {
+    $('warning-text').innerHTML = 'No fue posible calcular la tasa con los datos ingresados. Verificá que la cuota sea mayor al capital dividido por las cuotas.';
+    warnBox.classList.add('show');
+    return;
+  }
+
+  infoBox.classList.remove('hidden');
+
+  // Derived rates
+  const TNA  = TEM * 12;
+  const TEA  = Math.pow(1 + TEM, 12) - 1;
+  const TND  = TEM / 30;   // tasa nominal diaria
+  const TED  = Math.pow(1 + TEM, 1/30) - 1; // tasa efectiva diaria
+
+  // ── Amortization table ──
+  let saldo = P;
+  let sumIntereses = 0, sumAmort = 0, sumIVA = 0, sumSeguro = 0, sumCuotaTotal = 0;
+  const rows = [];
+  const flows = [P - gastosOtorg];
+
+  // stacked bar data
+  const labelsBar = [], capData = [], intData = [], ivaData = [], segData = [];
+
+  for (let t = 1; t <= n; t++) {
+    const intMes     = saldo * TEM;
+    const amortMes   = C - intMes;
+    const ivaMes     = ivaEnabled ? intMes * IVA_RATE : 0;
+    const seguroMes  = saldo * seguroPct;
+    const cuotaTotal = C + ivaMes + seguroMes;
+    const saldoFinal = saldo - amortMes;
+
+    sumIntereses  += intMes;
+    sumAmort      += amortMes;
+    sumIVA        += ivaMes;
+    sumSeguro     += seguroMes;
+    sumCuotaTotal += cuotaTotal;
+    flows.push(-cuotaTotal);
+
+    rows.push({ t, saldo, C, intMes, amortMes, ivaMes, seguroMes, cuotaTotal, saldoFinal: Math.max(0, saldoFinal) });
+    labelsBar.push(`C${t}`);
+    capData.push(amortMes);
+    intData.push(intMes);
+    ivaData.push(ivaMes);
+    segData.push(seguroMes);
+
+    saldo = Math.max(0, saldoFinal);
+  }
+  lastTable = rows;
+
+  const totalBase     = C * n;
+  const grandTotal    = sumCuotaTotal + gastosOtorg;
+  const cargaTotal    = (grandTotal - P) / P * 100;
+
+  // CFT via IRR
+  const irr = calcIRR(flows);
+  const CFT_NA = irr * 12 * 100;          // nominal anual %
+  const CFT_EA = (Math.pow(1+irr,12)-1)*100; // efectivo anual %
+
+  // ── Render rates ──
+  $('res-tem').textContent  = fmtPct(TEM);
+  $('res-tna').textContent  = fmtPct(TNA);
+  $('res-tea').textContent  = fmtPct(TEA);
+  $('res-cft-na').textContent = CFT_NA.toFixed(2) + '%';
+  $('res-cft-ea').textContent = CFT_EA.toFixed(2) + '%';
+  $('res-tnd').textContent  = (TND * 100).toFixed(4) + '%';
+  $('res-ted').textContent  = (TED * 100).toFixed(4) + '%';
+  $('res-total').textContent     = fmt(totalBase);
+  $('res-int-total').textContent = fmt(sumIntereses);
+  $('res-carga').textContent     = cargaTotal.toFixed(2) + '%';
+
+  // Totales extra (IVA/seguro/grand)
+  const extrasRow = $('totals-row-extra');
+  if (ivaEnabled || seguroPct > 0) {
+    extrasRow.style.display = 'grid';
+    $('res-total-iva').textContent    = fmt(sumIVA);
+    $('res-total-seguro').textContent = fmt(sumSeguro);
+    $('res-grand-total').textContent  = fmt(grandTotal);
+  } else {
+    extrasRow.style.display = 'none';
+  }
+
+  // ── Comparison ──
+  $('comp-my-tna').textContent = fmtPct(TNA);
+  $('comp-my-tea').textContent = fmtPct(TEA);
+  $('comp-my-cft').textContent = CFT_NA.toFixed(2) + '%';
+  const tnaVal = TNA * 100;
+  $('comp-nacion').innerHTML   = tnaVal < 60   ? '<span class="badge badge-green">Mejor que Banco Nación ✓</span>'
+                                : tnaVal === 60 ? '<span class="badge badge-blue">Igual a Banco Nación</span>'
+                                : tnaVal < 98  ? '<span class="badge badge-orange">Entre Nación y Provincia</span>'
+                                                : '<span class="badge badge-red">Por encima de Banco Nación</span>';
+  $('comp-provincia').innerHTML = tnaVal < 98  ? '<span class="badge badge-green">Mejor que Banco Provincia ✓</span>'
+                                               : '<span class="badge badge-red">Por encima de Banco Provincia</span>';
+  $('comp-fintech').innerHTML   = tnaVal < 298 ? '<span class="badge badge-green">Mejor que financieras ✓</span>'
+                                               : '<span class="badge badge-red">Similar/mayor a financieras</span>';
+  $('comp-express').innerHTML   = tnaVal < 500 ? '<span class="badge badge-green">Mejor que préstamos express ✓</span>'
+                                               : '<span class="badge badge-red">Similar a préstamos express</span>';
+
+  // ── Charts ──
+  buildDonut(P, sumIntereses, sumIVA, sumSeguro, gastosOtorg);
+  buildBar(labelsBar, capData, intData, ivaData, segData, n);
+
+  // ── Table ──
+  buildTable(rows, ivaEnabled, seguroPct > 0, sumAmort, sumIntereses, sumIVA, sumSeguro, sumCuotaTotal, n);
+
+  // Show results
+  $('empty-state').classList.add('hidden');
+  $('results-content').classList.remove('hidden');
+
+  // Scroll to results on mobile
+  if (window.innerWidth < 1100) {
+    setTimeout(() => $('results-content').scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+  }
+}
+
+// ── Build donut ──
+function buildDonut(capital, intereses, iva, seguro, gastos) {
+  const ctx = $('donut-chart').getContext('2d');
+  if (donutChart) donutChart.destroy();
+  const labels = ['Capital'];
+  const data   = [capital];
+  const colors = ['#3B82F6'];
+
+  if (intereses > 0) { labels.push('Intereses'); data.push(intereses); colors.push('#F59E0B'); }
+  if (iva > 0)       { labels.push('IVA (21%)'); data.push(iva);       colors.push('#A78BFA'); }
+  if (seguro > 0)    { labels.push('Seguros');   data.push(seguro);    colors.push('#F87171'); }
+  if (gastos > 0)    { labels.push('Gastos');    data.push(gastos);    colors.push('#6B7280'); }
+
+  donutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 2, borderColor: '#1A3560', hoverOffset: 6 }] },
+    options: {
+      responsive: true,
+      cutout: '70%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${fmt(ctx.raw)} (${(ctx.raw / ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0)*100).toFixed(1)}%)`
+          }
+        }
+      }
+    }
+  });
+
+  // Custom legend
+  $('donut-legend').innerHTML = labels.map((l,i) =>
+    `<span style="display:inline-flex;align-items:center;gap:.3rem;margin:.15rem .4rem;font-size:.72rem;color:var(--text-dim)">
+      <span style="width:10px;height:10px;border-radius:50%;background:${colors[i]};display:inline-block"></span>
+      ${l}: ${fmt(data[i])}
+    </span>`
+  ).join('');
+}
+
+// ── Build bar chart ──
+function buildBar(labels, cap, int, iva, seg, n) {
+  const ctx = $('bar-chart').getContext('2d');
+  if (barChart) barChart.destroy();
+
+  // For large n, show every Nth label
+  const step = n > 60 ? 12 : n > 24 ? 6 : n > 12 ? 3 : 1;
+  const tickLabels = labels.map((l,i) => i % step === 0 ? l : '');
+
+  const datasets = [
+    { label: 'Capital', data: cap, backgroundColor: '#3B82F6', stack: 'a' },
+    { label: 'Interés', data: int, backgroundColor: '#F59E0B', stack: 'a' },
+  ];
+  if (iva.some(v => v > 0))  datasets.push({ label: 'IVA', data: iva, backgroundColor: '#A78BFA', stack: 'a' });
+  if (seg.some(v => v > 0))  datasets.push({ label: 'Seguro', data: seg, backgroundColor: '#F87171', stack: 'a' });
+
+  barChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: tickLabels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, grid: { color: 'rgba(255,255,255,.05)' }, ticks: { color: '#94A3B8', font: { size: 10 } } },
+        y: { stacked: true, grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#94A3B8', font: { size: 10 }, callback: v => '$' + (v >= 1e6 ? (v/1e6).toFixed(1)+'M' : v >= 1e3 ? (v/1e3).toFixed(0)+'k' : v) } }
+      },
+      plugins: {
+        legend: { labels: { color: '#94A3B8', font: { size: 11 }, boxWidth: 12, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.raw)}` } }
+      }
+    }
+  });
+}
+
+// ── Build amort table ──
+function buildTable(rows, ivaEnabled, segEnabled, sumAmort, sumIntereses, sumIVA, sumSeguro, sumCuotaTotal, n) {
+  const showIVA    = ivaEnabled;
+  const showSeguro = segEnabled;
+
+  // Head
+  let headHTML = '<tr>';
+  headHTML += '<th>Cuota</th>';
+  headHTML += '<th>Saldo inicial</th>';
+  headHTML += '<th>Capital</th>';
+  headHTML += '<th>Interés</th>';
+  if (showIVA)    headHTML += '<th>IVA Interés</th>';
+  if (showSeguro) headHTML += '<th>Seguro</th>';
+  headHTML += '<th>Cuota base</th>';
+  if (showIVA || showSeguro) headHTML += '<th>Cuota total</th>';
+  headHTML += '<th>Saldo final</th>';
+  headHTML += '</tr>';
+  $('table-head').innerHTML = headHTML;
+
+  // Body
+  let bodyHTML = '';
+  const maxRows = 120; // safety
+  rows.slice(0, maxRows).forEach(r => {
+    bodyHTML += `<tr>
+      <td>${r.t}</td>
+      <td class="saldo">${fmt(r.saldo)}</td>
+      <td class="capital">${fmt(r.amortMes)}</td>
+      <td class="interes">${fmt(r.intMes)}</td>`;
+    if (showIVA)    bodyHTML += `<td class="iva">${fmt(r.ivaMes)}</td>`;
+    if (showSeguro) bodyHTML += `<td class="seguro">${fmt(r.seguroMes)}</td>`;
+    bodyHTML += `<td>${fmt(r.C)}</td>`;
+    if (showIVA || showSeguro) bodyHTML += `<td class="cuota-total">${fmt(r.cuotaTotal)}</td>`;
+    bodyHTML += `<td class="saldo">${fmt(r.saldoFinal)}</td>
+    </tr>`;
+  });
+  $('amort-body').innerHTML = bodyHTML;
+
+  // Foot
+  let footHTML = '<tr>';
+  footHTML += '<td><strong>TOTAL</strong></td>';
+  footHTML += '<td>—</td>';
+  footHTML += `<td>${fmt(sumAmort)}</td>`;
+  footHTML += `<td>${fmt(sumIntereses)}</td>`;
+  if (showIVA)    footHTML += `<td>${fmt(sumIVA)}</td>`;
+  if (showSeguro) footHTML += `<td>${fmt(sumSeguro)}</td>`;
+  footHTML += `<td>${fmt(sumCuotaTotal - sumIVA - sumSeguro)}</td>`;
+  if (showIVA || showSeguro) footHTML += `<td>${fmt(sumCuotaTotal)}</td>`;
+  footHTML += '<td>—</td>';
+  footHTML += '</tr>';
+  $('table-foot').innerHTML = footHTML;
+
+  $('table-cols-info').textContent = `${n} cuotas mensuales`;
+}
+
+// ── Seguro toggle ──
+$('toggle-seguro').addEventListener('change', function() {
+  $('seguro-group').style.opacity = this.checked ? '1' : '.4';
+  $('seguro-pct').disabled = !this.checked;
+});
+
+// ── Init ──
+updateSliderFill();
+// Auto-calculate on load
+calcular();
+</script>
+</body>
+</html>
